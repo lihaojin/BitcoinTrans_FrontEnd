@@ -11,5 +11,6 @@
 }
 
 .trans-tablerow #amt-btc {
-  width: 40%;
+  width: 25%;
+  margin-left: 5.5%;
 }

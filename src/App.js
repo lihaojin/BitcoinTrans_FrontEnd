@@ -88,7 +88,7 @@ class App extends Component {
           for(var i=0;i<response.data.txs.length; i++) {
             var newTransaction = {
               hash: response.data.txs[i].hash,
-              amount: satToBtc(response.data.txs[i].size),
+              amount: satToBtc(response.data.txs[i].size).toFixed(8),
             }
             transactions.push(newTransaction);
             this.setState({transactions: transactions});
@@ -117,24 +117,22 @@ class App extends Component {
 
         <div className="animated fadeInUp">
           <div className="transactions">
-            <div className="animated fadeInLeft">
               <div className="transaction-header">
                 <div className="trans-header-title">Transactions for BTC Addresses</div>
-                <textarea
-                  placeholder="Search by BTC address..."
-                  value={this.state.messageValue}
-                  onKeyPress={this.handleKeyPress}
-                  onChange={this.handleChange}
-                  >
-                </textarea>
-                <div className="balance">
-                  <p id="bal-label">Balance:</p>
-                  <p id="bal-value">{this.state.balance} BTC</p>
-                  <p id="address-label">Address:</p>
-                  <p id="address-value">{this.state.address}</p>
+                  <textarea
+                    placeholder="Search by BTC address..."
+                    value={this.state.messageValue}
+                    onKeyPress={this.handleKeyPress}
+                    onChange={this.handleChange}
+                    >
+                  </textarea>
+                  <div className="balance">
+                    <p id="address-label">Address:</p>
+                    <p id="address-value">{this.state.address}</p>
+                    <p id="bal-label">Balance:</p>
+                    <p id="bal-value">{this.state.balance} BTC</p>
+                  </div>
                 </div>
-              </div>
-            </div>
             <div id="transactiontable"> <TransactionTable transactions={this.state.transactions}/></div>
           </div>
         </div>
