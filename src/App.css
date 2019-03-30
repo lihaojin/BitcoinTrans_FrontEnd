@@ -20,6 +20,16 @@ img {
   flex-direction: column;
 }
 
+.trans-header-title {
+  display: flex;
+  justify-content: center;
+  font-family: 'Roboto', sans-serif;
+  font-size: 25px;
+  font-weight: bold;
+  color: white;
+  margin-top: 25px;
+}
+
 .transactions {
   display: flex;
   flex-direction: column;
@@ -71,5 +81,15 @@ img {
 .balance {
   display: flex;
   flex-direction: row;
-  margin-left: 85px;
+  margin-left: 90px;
+}
+
+.balance #bal-value {
+  display: flex;
+  margin-left: 10px;
+}
+
+.balance #address-value {
+  display: flex;
+  margin-left: 10px;
 }

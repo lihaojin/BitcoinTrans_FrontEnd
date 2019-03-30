@@ -8,7 +8,7 @@ class App extends Component {
     super(props);
     this.state = {
       messageValue: "",
-      address: "Null",
+      address: "0",
       balance: 0,
       transactions: []
     };
@@ -119,6 +119,7 @@ class App extends Component {
           <div className="transactions">
             <div className="animated fadeInLeft">
               <div className="transaction-header">
+                <div className="trans-header-title">Transactions for BTC Addresses</div>
                 <textarea
                   placeholder="Search by BTC address..."
                   value={this.state.messageValue}
@@ -127,10 +128,10 @@ class App extends Component {
                   >
                 </textarea>
                 <div className="balance">
-                  <p>Balance:</p>
-                  <p>{this.state.balance} BTC</p>
-                  <p>Address:</p>
-                  <p>{this.state.address}</p>
+                  <p id="bal-label">Balance:</p>
+                  <p id="bal-value">{this.state.balance} BTC</p>
+                  <p id="address-label">Address:</p>
+                  <p id="address-value">{this.state.address}</p>
                 </div>
               </div>
             </div>
