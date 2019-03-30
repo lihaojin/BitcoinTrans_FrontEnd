@@ -1,0 +1,38 @@
+.trans-table {
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  height: 400px;
+  width: 80%;
+  border-radius: 10px;
+  box-shadow: 3px 4px 5px 0px rgba(0,0,0,0.75);
+}
+
+.table-header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  font-family: 'Raleway', sans-serif;
+  font-weight: bold;
+  color: white;
+  background-color: black;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  padding: 20px;
+}
+
+.table-header #trans-hash {
+  width: 60%;
+}
+
+.table-header #amt-btc {
+  margin-left: 9%;
+  width: 40%;
+}
+
+
+.table-body {
+  overflow-y: scroll;
+  scrollbar-width: thin;
+  scrollbar-color: dimgray white;
+}

@@ -1,0 +1,15 @@
+.trans-tablerow {
+  display: flex;
+  flex-direction: row;
+  border-top: 1px rgb(204, 206, 209) solid;
+  padding: 10px;
+}
+
+.trans-tablerow #trans-hash {
+  width: 70%;
+  padding-left: 10px;
+}
+
+.trans-tablerow #amt-btc {
+  width: 40%;
+}
