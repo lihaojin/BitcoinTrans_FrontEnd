@@ -1,4 +1,4 @@
-# # BitcoinTrans - Bitcoin transactions for any BTC address
+# BitcoinTrans - Bitcoin transactions for any BTC address
 
 **BitcoinTrans** is a web application utilizing Blockchain.info API to retrieve the most recent transactions.
 
