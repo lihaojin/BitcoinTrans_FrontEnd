@@ -49,7 +49,7 @@ class App extends Component {
                 // handle error
                 console.log(error);
               });
-        }, 3000);
+        }, 10000);
      }
    }
 
