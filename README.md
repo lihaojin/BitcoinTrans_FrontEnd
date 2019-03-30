@@ -1,6 +1,6 @@
 # BitcoinTrans 
 
-**BitcoinTrans** 
+**BitcoinTrans** is a web application utilizing Blockchain.info API to retrieve the most recent transactions for any given   address.
 
 ## How to Run
 1. Clone this repository
