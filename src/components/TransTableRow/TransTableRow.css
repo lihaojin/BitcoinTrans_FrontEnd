@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: row;
   border-top: 1px rgb(204, 206, 209) solid;
+  font-size: 12px;
   padding: 10px;
 }
 
