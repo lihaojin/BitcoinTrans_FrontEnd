@@ -4,6 +4,10 @@ import TransactionTable from './views/TransactionTable/TransactionTable.js';
 import ReconnectingWebSocket from 'reconnecting-websocket'
 const axios = require('axios');
 
+const socket = new ReconnectingWebSocket('wss://ws.blockchain.info/inv');
+socket.debug = true;
+socket.timeoutInterval = 3000;
+
 class App extends Component {
   constructor(props) {
     super(props);
@@ -21,29 +25,26 @@ class App extends Component {
   }
 
   componentDidMount() {
-      this.socket = new ReconnectingWebSocket('wss://ws.blockchain.info/inv');
-      this.socket.debug = true;
-      this.socket.timeoutInterval = 3000;
       const address = this.state.address;
       var ping;
 
-      if(address !== "") {
+      if(address !== null) {
         this.setState({ping: {"op":"addr_sub", "addr":address}});
       }
       else {
         this.setState({ping: {"op":"unconfirmed_sub"}});
       }
 
-      this.socket.addEventListener('open', () => {
-         this.socket.send(ping)
+      socket.addEventListener('open', () => {
+         socket.send(ping)
          this.setState({connected:true})
       });
 
-      this.socket.addEventListener('error', () => {
+      socket.addEventListener('error', () => {
           this.setState({connected:false})
       });
 
-      this.socket.addEventListener('close', () => {
+      socket.addEventListener('close', () => {
           this.setState({connected:false})
       });
    }
