@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './App.css';
 import TransactionTable from './views/TransactionTable/TransactionTable.js';
+import ReconnectingWebSocket from 'reconnecting-websocket'
 const axios = require('axios');
 
 class App extends Component {
@@ -8,49 +9,43 @@ class App extends Component {
     super(props);
     this.state = {
       messageValue: "",
-      address: "0",
+      address: "",
       balance: 0,
-      transactions: []
+      transactions: [],
+      connected: false,
+      ping: ""
     };
     this.handleChange = this.handleChange.bind(this);
     this.handleKeyPress = this.handleKeyPress.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  async componentDidMount() {
-    let address = this.state.address;
-    if(address !== "") {
-      setInterval(async () => {
-          function satToBtc(x) {
-              return x * 0.00000001;
-          };
+  componentDidMount() {
+      this.socket = new ReconnectingWebSocket('wss://ws.blockchain.info/inv');
+      this.socket.debug = true;
+      this.socket.timeoutInterval = 3000;
+      const address = this.state.address;
+      var ping;
 
-            const baseURL = 'https://blockchain.info/rawaddr/';
-            const combURL = baseURL + address;
+      if(address !== "") {
+        this.setState({ping: {"op":"addr_sub", "addr":address}});
+      }
+      else {
+        this.setState({ping: {"op":"unconfirmed_sub"}});
+      }
 
-            axios.get(combURL)
-              .then((response) => {
-                // handle success
-                console.log(response);
+      this.socket.addEventListener('open', () => {
+         this.socket.send(ping)
+         this.setState({connected:true})
+      });
 
-                let transactions = [];
+      this.socket.addEventListener('error', () => {
+          this.setState({connected:false})
+      });
 
-                for(var i=0;i<response.data.txs.length; i++) {
-                  var newTransaction = {
-                    hash: response.data.txs[i].hash,
-                    amount: satToBtc(response.data.txs[i].size),
-                  }
-                  transactions.push(newTransaction);
-                  this.setState({transactions: transactions});
-                }
-                this.setState({balance: satToBtc(response.data.final_balance)});
-              })
-              .catch(function (error) {
-                // handle error
-                console.log(error);
-              });
-        }, 10000);
-     }
+      this.socket.addEventListener('close', () => {
+          this.setState({connected:false})
+      });
    }
 
   handleChange(event) {
