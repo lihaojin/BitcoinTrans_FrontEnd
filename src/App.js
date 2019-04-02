@@ -4,10 +4,6 @@ import TransactionTable from './views/TransactionTable/TransactionTable.js';
 import ReconnectingWebSocket from 'reconnecting-websocket'
 const axios = require('axios');
 
-const socket = new ReconnectingWebSocket('wss://ws.blockchain.info/inv');
-socket.debug = true;
-socket.timeoutInterval = 3000;
-
 class App extends Component {
   constructor(props) {
     super(props);
@@ -25,28 +21,48 @@ class App extends Component {
   }
 
   componentDidMount() {
-      const address = this.state.address;
-      var ping;
+      function satToBtc(x) {
+          return x * 0.00000001;
+      };
 
-      if(address !== null) {
+      const socket = new WebSocket('wss://ws.blockchain.info/inv');
+      socket.debug = true;
+      socket.timeoutInterval = 3000;
+      const address = this.state.address;
+
+      if(address !== "") {
         this.setState({ping: {"op":"addr_sub", "addr":address}});
       }
       else {
         this.setState({ping: {"op":"unconfirmed_sub"}});
       }
 
-      socket.addEventListener('open', () => {
+      socket.addEventListener('open', function (event) {
+         const ping = JSON.stringify(this.state.ping)
          socket.send(ping)
          this.setState({connected:true})
-      });
+      }.bind(this));
 
-      socket.addEventListener('error', () => {
+      socket.addEventListener('close', function(event) {
           this.setState({connected:false})
-      });
+      }.bind(this));
 
-      socket.addEventListener('close', () => {
+      socket.addEventListener('error', function(event) {
           this.setState({connected:false})
-      });
+      }.bind(this));
+
+      socket.addEventListener('message', function(event) {
+        const transactions = this.state.transactions
+        const data = JSON.parse(event.data)
+
+        var newTransaction = {
+          hash: data.x.hash,
+          amount: satToBtc(data.x.size).toFixed(8),
+        }
+
+        transactions.push(newTransaction)
+        this.setState({transactions: transactions})
+      }.bind(this));
    }
 
   handleChange(event) {
@@ -63,40 +79,8 @@ class App extends Component {
   }
 
   handleSubmit(event) {
-    function satToBtc(x) {
-        return x * 0.00000001;
-    };
-    const messageValue = this.state.messageValue;
-    this.setState({transactions: []});
-
-    if(messageValue !== "") {
-      const baseURL = 'https://blockchain.info/rawaddr/';
-      const combURL = baseURL + messageValue;
-      this.setState({address: messageValue});
-
-      axios.get(combURL)
-        .then((response) => {
-          // handle success
-          console.log(response);
-
-          let transactions = this.state.transactions;
-
-          for(var i=0;i<response.data.txs.length; i++) {
-            var newTransaction = {
-              hash: response.data.txs[i].hash,
-              amount: satToBtc(response.data.txs[i].size).toFixed(8),
-            }
-            transactions.push(newTransaction);
-            this.setState({transactions: transactions});
-          }
-          this.setState({balance: satToBtc(response.data.final_balance)});
-        })
-        .catch(function (error) {
-          // handle error
-          console.log(error);
-        });
-        event.preventDefault();
-    }
+    const messageValue = this.state.messageValue
+    this.setState({address: messageValue})
   }
 
   render() {
