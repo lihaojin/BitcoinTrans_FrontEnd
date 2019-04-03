@@ -3,6 +3,7 @@ import './App.css';
 import TransactionTable from './views/TransactionTable/TransactionTable.js';
 import ReconnectingWebSocket from 'reconnecting-websocket'
 const axios = require('axios');
+const socket = new WebSocket('wss://ws.blockchain.info/inv');
 
 class App extends Component {
   constructor(props) {
@@ -25,7 +26,6 @@ class App extends Component {
           return x * 0.00000001;
       };
 
-      const socket = new WebSocket('wss://ws.blockchain.info/inv');
       socket.debug = true;
       socket.timeoutInterval = 3000;
       const address = this.state.address;
@@ -53,6 +53,11 @@ class App extends Component {
 
       socket.addEventListener('message', function(event) {
         const transactions = this.state.transactions
+
+        if(transactions.length > 50) {
+          transactions.shift()
+        }
+
         const data = JSON.parse(event.data)
 
         var newTransaction = {
@@ -79,8 +84,32 @@ class App extends Component {
   }
 
   handleSubmit(event) {
-    const messageValue = this.state.messageValue
-    this.setState({address: messageValue})
+    function satToBtc(x) {
+        return x * 0.00000001;
+    };
+    const messageValue = this.state.messageValue;
+
+    if(messageValue !== "") {
+      const baseURL = 'https://blockchain.info/rawaddr/';
+      const combURL = baseURL + messageValue;
+      this.setState({address: messageValue});
+      this.setState({transactions: []});
+      this.setState({ping: {"op":"addr_sub", "addr":messageValue}});
+      const ping = this.state.ping
+      socket.send(ping);
+
+      axios.get(combURL)
+        .then((response) => {
+          // handle success
+          console.log(response);
+          this.setState({balance: satToBtc(response.data.final_balance)});
+        })
+        .catch(function (error) {
+          // handle error
+          console.log(error);
+        });
+        event.preventDefault();
+    }
   }
 
   render() {
