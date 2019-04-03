@@ -10,6 +10,11 @@
 
 **Side Note:** Merged recent changes to master 
 
-<img src='https://github.com/lihaojin/BitcoinTrans_FrontEnd/blob/master/updatedscreenshot.png' />
+**All Transactions**
+<img src='https://github.com/lihaojin/BitcoinTrans_FrontEnd/blob/master/bitcointransgif.gif' />
+
+**Selected Address Transactions**
+<img src='https://github.com/lihaojin/BitcoinTrans_FrontEnd/blob/master/bitcointransgif2.gif' />
+
 
 
