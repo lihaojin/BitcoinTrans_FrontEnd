@@ -22,21 +22,22 @@ class App extends Component {
   }
 
   componentDidMount() {
+    //convert satoshi to BTC
       function satToBtc(x) {
           return x * 0.00000001;
       };
 
+      //Set socket properties
       socket.debug = true;
       socket.timeoutInterval = 3000;
       const address = this.state.address;
 
-      if(address !== "") {
-        this.setState({ping: {"op":"addr_sub", "addr":address}});
-      }
-      else {
+      //change state of ping if empty address state
+      if(address === "") {
         this.setState({ping: {"op":"unconfirmed_sub"}});
       }
 
+      //Add event listeners
       socket.addEventListener('open', function (event) {
          const ping = JSON.stringify(this.state.ping)
          socket.send(ping)
@@ -54,10 +55,11 @@ class App extends Component {
       socket.addEventListener('message', function(event) {
         const transactions = this.state.transactions
 
-        if(transactions.length > 50) {
+        //limit transactions displayed
+        if(transactions.length > 49) {
           transactions.shift()
         }
-
+        
         const data = JSON.parse(event.data)
 
         var newTransaction = {
@@ -95,7 +97,7 @@ class App extends Component {
       this.setState({address: messageValue});
       this.setState({transactions: []});
       this.setState({ping: {"op":"addr_sub", "addr":messageValue}});
-      const ping = this.state.ping
+      const ping = JSON.stringify(this.state.ping);
       socket.send(ping);
 
       axios.get(combURL)
