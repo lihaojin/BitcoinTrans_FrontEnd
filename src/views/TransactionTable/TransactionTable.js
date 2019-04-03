@@ -14,16 +14,17 @@ class TransactionTable extends Component {
 
   render() {
     return (
-      <div className="trans-table">
+      <div className="root">
         <div className="table-header">
           <div id="trans-hash">Hash</div>
           <div id="amt-btc">Amount (BTC)</div>
         </div>
-
-        <div className="table-body">
-          {this.props.transactions.map(transactions => (
-            <TransTableRow hash={transactions.hash} amount={transactions.amount} />
-          ))}
+        <div className="trans-table">
+          <div className="table-body">
+            {this.props.transactions.map(transactions => (
+              <TransTableRow hash={transactions.hash} amount={transactions.amount} />
+            ))}
+          </div>
         </div>
       </div>
     );
