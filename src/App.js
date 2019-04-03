@@ -28,7 +28,6 @@ class App extends Component {
       };
 
       //Set socket properties
-      socket.debug = true;
       socket.timeoutInterval = 3000;
       const address = this.state.address;
 
@@ -59,7 +58,7 @@ class App extends Component {
         if(transactions.length > 49) {
           transactions.shift()
         }
-        
+
         const data = JSON.parse(event.data)
 
         var newTransaction = {
