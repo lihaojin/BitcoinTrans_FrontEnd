@@ -80,7 +80,7 @@ img {
 .balance {
   display: flex;
   flex-direction: row;
-  margin-left: 155px;
+  margin-left: 215px;
 }
 
 .balance #bal-value {

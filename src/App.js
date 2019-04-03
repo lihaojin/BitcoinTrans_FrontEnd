@@ -3,7 +3,7 @@ import './App.css';
 import TransactionTable from './views/TransactionTable/TransactionTable.js';
 import ReconnectingWebSocket from 'reconnecting-websocket'
 const axios = require('axios');
-const socket = new WebSocket('wss://ws.blockchain.info/inv');
+const socket = new ReconnectingWebSocket('wss://ws.blockchain.info/inv');
 
 class App extends Component {
   constructor(props) {
@@ -22,13 +22,13 @@ class App extends Component {
   }
 
   componentDidMount() {
-    //convert satoshi to BTC
+     //convert satoshi to BTC
       function satToBtc(x) {
           return x * 0.00000001;
       };
 
       //Set socket properties
-      socket.timeoutInterval = 3000;
+      socket.timeoutInterval = 1000;
       const address = this.state.address;
 
       //change state of ping if empty address state
@@ -43,31 +43,67 @@ class App extends Component {
          this.setState({connected:true})
       }.bind(this));
 
+      //onclose event
       socket.addEventListener('close', function(event) {
           this.setState({connected:false})
+
+          //New instance of websocket onClose
+          const socket = new ReconnectingWebSocket('wss://ws.blockchain.info/inv');
+
+          socket.addEventListener('open', function (event) {
+             const ping = JSON.stringify(this.state.ping)
+             socket.send(ping)
+             this.setState({connected:true})
+          }.bind(this));
+
+          socket.addEventListener('error', function(event) {
+              this.setState({connected:false})
+          }.bind(this));
+
+          socket.addEventListener('message', function(event) {
+              const transactions = this.state.transactions
+
+              //limit transactions displayed
+              if(transactions.length > 49) {
+                transactions.shift()
+              }
+
+              const data = JSON.parse(event.data)
+
+              var newTransaction = {
+                hash: data.x.hash,
+                amount: satToBtc(data.x.size).toFixed(8),
+              }
+
+              transactions.push(newTransaction)
+              this.setState({transactions: transactions})
+          }.bind(this));
+
       }.bind(this));
 
+      //onerror event
       socket.addEventListener('error', function(event) {
           this.setState({connected:false})
       }.bind(this));
 
+      //onmessage event
       socket.addEventListener('message', function(event) {
-        const transactions = this.state.transactions
+          const transactions = this.state.transactions
 
-        //limit transactions displayed
-        if(transactions.length > 49) {
-          transactions.shift()
-        }
+          //limit transactions displayed
+          if(transactions.length > 49) {
+            transactions.shift()
+          }
 
-        const data = JSON.parse(event.data)
+          const data = JSON.parse(event.data)
 
-        var newTransaction = {
-          hash: data.x.hash,
-          amount: satToBtc(data.x.size).toFixed(8),
-        }
+          var newTransaction = {
+            hash: data.x.hash,
+            amount: satToBtc(data.x.size).toFixed(8),
+          }
 
-        transactions.push(newTransaction)
-        this.setState({transactions: transactions})
+          transactions.push(newTransaction)
+          this.setState({transactions: transactions})
       }.bind(this));
    }
 
@@ -96,13 +132,22 @@ class App extends Component {
       this.setState({address: messageValue});
       this.setState({transactions: []});
       this.setState({ping: {"op":"addr_sub", "addr":messageValue}});
-      const ping = JSON.stringify(this.state.ping);
-      socket.send(ping);
+      socket.close()
 
       axios.get(combURL)
         .then((response) => {
           // handle success
           console.log(response);
+          let transactions = this.state.transactions;
+
+          for(var i=0;i<response.data.txs.length; i++) {
+            var newTransaction = {
+              hash: response.data.txs[i].hash,
+              amount: satToBtc(response.data.txs[i].size).toFixed(8),
+            }
+            transactions.push(newTransaction);
+            this.setState({transactions: transactions});
+          }
           this.setState({balance: satToBtc(response.data.final_balance)});
         })
         .catch(function (error) {
